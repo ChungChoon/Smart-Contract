@@ -7,12 +7,13 @@ contract ChungChulContract is Ownable {
     bytes32[] public lectureIDs; // Lecture ID Array
     mapping(bytes32 => Lecture) internal lectures; // Mapping Lecture struct with ID
 
-    event CreatingLecture(bytes32 indexed id, address indexed teacher, uint lectureCost);
+    event CreatingLecture(bytes32 indexed id, address indexed teacher, uint lectureCost, uint indexed lectureNumber);
     event EvaluatingLecture(bytes32 indexed lectureID, address indexed evaluater, uint evaluatingCount);
     
     // A Lecture Struct
     struct Lecture {
         bytes32 id; // Lecture ID
+        uint lectureNumber; // Lecture IDs Index (Server Lecture PK)
         uint index; // Lecture index (Reused Count)
         address teacher; // Teacher Address
         address[] students; // Students Address Array
@@ -82,6 +83,22 @@ contract ChungChulContract is Ownable {
     }
     
     /**
+    * @dev Get Lecture number in LectureIDs
+    * @param lectureID Based on keccak256 ID.
+    */
+    function getLectureNumber(bytes32 lectureID) public view returns (uint lectureNumber){
+        Lecture memory lecture = lectures[lectureID];
+        require(lecture.exists);
+        for (uint i = 0; i < lectureIDs.length; i++){
+            if (lectureID == lectureIDs[i]){
+                lectureNumber = i;
+                break;
+            }
+        }
+        return lectureNumber;
+    }
+    
+    /**
     * @dev Create Lecture by Teacher (Used for the first creation of a lecture)
     * @param lectureCost Lecture Fee determined by the teacher
     */
@@ -90,7 +107,9 @@ contract ChungChulContract is Ownable {
         lectureIDs.push(id);
         
         Lecture storage lecture = lectures[id];
-        if(!lecture.exists) {
+        if(lecture.exists == true) {
+            revert();
+        } else {
             lecture.id = id;
             lecture.index = 0;
             lecture.teacher = msg.sender;
@@ -104,8 +123,9 @@ contract ChungChulContract is Ownable {
             lecture.communication_point[0] = 0;
             lecture.satisfaction_point[0] = 0;
             lecture.averagePoint = 0;
+            lecture.lectureNumber = getLectureNumber(id);
             
-            emit CreatingLecture(id, msg.sender, lectureCost);
+            emit CreatingLecture(id, msg.sender, lectureCost, lecture.lectureNumber);
         }
     }
     
@@ -132,7 +152,7 @@ contract ChungChulContract is Ownable {
             lecture.communication_point[lecture.index] = 0;
             lecture.satisfaction_point[lecture.index] = 0;
             
-        emit CreatingLecture(lectureID, msg.sender, lectureCost); 
+        emit CreatingLecture(lectureID, msg.sender, lectureCost, lecture.lectureNumber); 
         
         } else {
             revert();
