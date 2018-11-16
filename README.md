@@ -6,6 +6,11 @@
 * [Remix](http://remix.ethereum.org/#optimize=true&version=soljson-v0.4.25+commit.59dbf8f1.js)
 * [Klaytn Aspen Network](https://www.klaytn.com/)
 
+## # Contract Explanation
+
+* [ChungChul.sol](https://github.com/ChungChoon/Smart-Contract/blob/master/ChungChul.sol)
+* [Ownable.sol](https://github.com/ChungChoon/Smart-Contract/blob/master/Ownable.sol)
+
 ## # Flow Chart
 
 계약 참여자를 강사(농부), 수강생, 청출어람(Owner) 세 부류로 나눌수 있습니다.
